@@ -1,0 +1,11 @@
+@Pos.Web.API_HostAddress = http://localhost:5249
+
+GET {{Pos.Web.API_HostAddress}}/todos/
+Accept: application/json
+
+###
+
+GET {{Pos.Web.API_HostAddress}}/todos/1
+Accept: application/json
+
+###
