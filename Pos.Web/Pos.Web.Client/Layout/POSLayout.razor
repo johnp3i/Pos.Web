@@ -1,0 +1,53 @@
+@inherits LayoutComponentBase
+@inject IAuthenticationService AuthService
+@inject NavigationManager Navigation
+
+<MudThemeProvider Theme="@_posTheme" />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<div class="pos-layout">
+    <!-- Header -->
+    <MudAppBar Elevation="2" Dense="true" Class="pos-appbar">
+        <MudButton StartIcon="@Icons.Material.Filled.History" Color="Color.Inherit">History</MudButton>
+        <MudButton StartIcon="@Icons.Material.Filled.Percent" Color="Color.Inherit">Discount</MudButton>
+        <MudSpacer />
+        <MudText Typo="Typo.h6">MyChair POS</MudText>
+        <MudSpacer />
+        <MudBadge Content="@_pendingCount" Color="Color.Warning" Overlap="true">
+            <MudButton StartIcon="@Icons.Material.Filled.PendingActions" Color="Color.Inherit">
+                Pending
+            </MudButton>
+        </MudBadge>
+        <MudIconButton Icon="@Icons.Material.Filled.Settings" Color="Color.Inherit" />
+        <MudIconButton Icon="@Icons.Material.Filled.ExitToApp" Color="Color.Inherit" OnClick="Logout" />
+    </MudAppBar>
+    
+    <!-- Main Content -->
+    <div style="height: calc(100vh - 64px); overflow: auto;">
+        @Body
+    </div>
+</div>
+
+@code {
+    private int _pendingCount = 0;
+    
+    private MudTheme _posTheme = new MudTheme()
+    {
+        PaletteLight = new PaletteLight()
+        {
+            Primary = "#4682B4",      // SteelBlue
+            Secondary = "#FFA500",    // Orange
+            Success = "#4CAF50",      // Green
+            Error = "#DC143C",        // Crimson
+            Warning = "#FFD700",      // Gold
+            Info = "#1976D2"          // Blue
+        }
+    };
+    
+    private async Task Logout()
+    {
+        await AuthService.LogoutAsync();
+        Navigation.NavigateTo("/identity/login");
+    }
+}

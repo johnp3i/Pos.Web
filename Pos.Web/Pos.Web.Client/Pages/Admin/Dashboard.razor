@@ -1,0 +1,67 @@
+@page "/admin/dashboard"
+@attribute [Authorize(Roles = "Admin,Manager")]
+@layout AdminLayout
+
+<PageTitle>Dashboard - MyChair POS Admin</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.False" Class="pa-4">
+    <MudText Typo="Typo.h4" Class="mb-4">Dashboard</MudText>
+    
+    <MudGrid>
+        <MudItem xs="12" sm="6" md="3">
+            <MudPaper Class="pa-4 admin-stat-card-blue">
+                <MudText Typo="Typo.h6" Color="Color.Surface">Today's Sales</MudText>
+                <MudText Typo="Typo.h3" Color="Color.Surface">€1,234</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Surface">+12% from yesterday</MudText>
+            </MudPaper>
+        </MudItem>
+        
+        <MudItem xs="12" sm="6" md="3">
+            <MudPaper Class="pa-4 admin-stat-card-green">
+                <MudText Typo="Typo.h6" Color="Color.Surface">Orders</MudText>
+                <MudText Typo="Typo.h3" Color="Color.Surface">45</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Surface">8 pending</MudText>
+            </MudPaper>
+        </MudItem>
+        
+        <MudItem xs="12" sm="6" md="3">
+            <MudPaper Class="pa-4 admin-stat-card-orange">
+                <MudText Typo="Typo.h6" Color="Color.Surface">Customers</MudText>
+                <MudText Typo="Typo.h3" Color="Color.Surface">123</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Surface">5 new today</MudText>
+            </MudPaper>
+        </MudItem>
+        
+        <MudItem xs="12" sm="6" md="3">
+            <MudPaper Class="pa-4 admin-stat-card-red">
+                <MudText Typo="Typo.h6" Color="Color.Surface">Low Stock</MudText>
+                <MudText Typo="Typo.h3" Color="Color.Surface">7</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Surface">Items need restock</MudText>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+    
+    <MudGrid Class="mt-4">
+        <MudItem xs="12" md="8">
+            <MudPaper Class="pa-4" Elevation="2">
+                <MudText Typo="Typo.h6" Class="mb-4">Sales Chart</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">
+                    Sales chart will be implemented here
+                </MudText>
+            </MudPaper>
+        </MudItem>
+        
+        <MudItem xs="12" md="4">
+            <MudPaper Class="pa-4" Elevation="2">
+                <MudText Typo="Typo.h6" Class="mb-4">Recent Orders</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">
+                    Recent orders list will be displayed here
+                </MudText>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+</MudContainer>
+
+@code {
+    // Dashboard logic will be implemented here
+}

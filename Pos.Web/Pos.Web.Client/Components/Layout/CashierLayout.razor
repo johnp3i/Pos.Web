@@ -1,0 +1,128 @@
+@inherits LayoutComponentBase
+
+<MudThemeProvider Theme="_theme" />
+<MudPopoverProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<div class="cashier-layout">
+    <!-- Header Bar -->
+    <div class="cashier-header">
+        <MudPaper Elevation="2" Class="pa-3">
+            <MudGrid Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+                <MudItem xs="4">
+                    <MudText Typo="Typo.h5" Color="Color.Primary">
+                        <MudIcon Icon="@Icons.Material.Filled.PointOfSale" Class="mr-2" />
+                        Cashier Station
+                    </MudText>
+                </MudItem>
+                <MudItem xs="4" Class="text-center">
+                    <MudText Typo="Typo.h6">@DateTime.Now.ToString("ddd, MMM dd yyyy HH:mm")</MudText>
+                </MudItem>
+                <MudItem xs="4" Class="text-right">
+                    <AuthorizeView>
+                        <Authorized>
+                            <MudChip T="string" Icon="@Icons.Material.Filled.Person" Color="Color.Primary">
+                                @context.User.Identity?.Name
+                            </MudChip>
+                            <MudIconButton Icon="@Icons.Material.Filled.ExitToApp" 
+                                         Color="Color.Default" 
+                                         Href="/logout"
+                                         Title="Logout" />
+                        </Authorized>
+                    </AuthorizeView>
+                </MudItem>
+            </MudGrid>
+        </MudPaper>
+    </div>
+    
+    <!-- Main Content Area -->
+    <div class="cashier-content">
+        @Body
+    </div>
+    
+    <!-- Footer with Quick Actions -->
+    <div class="cashier-footer">
+        <MudPaper Elevation="2" Class="pa-2">
+            <MudGrid Spacing="2" Justify="Justify.Center">
+                <MudItem>
+                    <MudButton Variant="Variant.Filled" 
+                             Color="Color.Info" 
+                             StartIcon="@Icons.Material.Filled.History"
+                             Href="/pending-orders">
+                        Pending Orders
+                    </MudButton>
+                </MudItem>
+                <MudItem>
+                    <MudButton Variant="Variant.Filled" 
+                             Color="Color.Info" 
+                             StartIcon="@Icons.Material.Filled.Receipt"
+                             Href="/invoice-history">
+                        Invoice History
+                    </MudButton>
+                </MudItem>
+                <MudItem>
+                    <MudButton Variant="Variant.Filled" 
+                             Color="Color.Warning" 
+                             StartIcon="@Icons.Material.Filled.MoneyOff"
+                             OnClick="@OpenCashDrawer">
+                        Open Drawer
+                    </MudButton>
+                </MudItem>
+                <MudItem>
+                    <MudButton Variant="Variant.Filled" 
+                             Color="Color.Default" 
+                             StartIcon="@Icons.Material.Filled.Settings"
+                             Href="/settings">
+                        Settings
+                    </MudButton>
+                </MudItem>
+            </MudGrid>
+        </MudPaper>
+    </div>
+</div>
+
+<style>
+    .cashier-layout {
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        overflow: hidden;
+    }
+    
+    .cashier-header {
+        flex-shrink: 0;
+    }
+    
+    .cashier-content {
+        flex: 1;
+        overflow: auto;
+        padding: 16px;
+    }
+    
+    .cashier-footer {
+        flex-shrink: 0;
+    }
+</style>
+
+@code {
+    private MudTheme _theme = new()
+    {
+        PaletteLight = new PaletteLight
+        {
+            Primary = "#4682B4",        // SteelBlue
+            Secondary = "#FFA500",      // Orange
+            Success = "#4CAF50",        // Green
+            Error = "#DC143C",          // Crimson
+            Warning = "#FFD700",        // Gold
+            Info = "#1976D2"            // Blue
+        }
+    };
+    
+    private void OpenCashDrawer()
+    {
+        // TODO: Implement cash drawer opening via print service
+        // For now, just show a notification
+        Console.WriteLine("Cash drawer open requested");
+    }
+}

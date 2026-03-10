@@ -1,0 +1,146 @@
+@inject IDispatcher Dispatcher
+
+<div class="pos-cart-item">
+    <MudGrid Spacing="1" AlignItems="AlignItems.Center">
+        <!-- Product Info -->
+        <MudItem xs="6">
+            <MudText Typo="Typo.body1" Class="font-weight-bold">
+                @Item.Product?.Name
+            </MudText>
+            
+            <!-- Extras -->
+            @if (Item.Extras.Any())
+            {
+                <MudText Typo="Typo.caption" Color="Color.Secondary">
+                    + @string.Join(", ", Item.Extras.Select(e => e.Name))
+                </MudText>
+            }
+            
+            <!-- Flavors -->
+            @if (Item.Flavors.Any())
+            {
+                <MudText Typo="Typo.caption" Color="Color.Secondary">
+                    Flavors: @string.Join(", ", Item.Flavors.Select(f => f.Name))
+                </MudText>
+            }
+            
+            <!-- Notes -->
+            @if (!string.IsNullOrEmpty(Item.Notes))
+            {
+                <MudText Typo="Typo.caption" Color="Color.Info">
+                    <MudIcon Icon="@Icons.Material.Filled.StickyNote2" Size="Size.Small" />
+                    @Item.Notes
+                </MudText>
+            }
+        </MudItem>
+        
+        <!-- Quantity Controls -->
+        <MudItem xs="3">
+            <MudNumericField @bind-Value="_quantity"
+                           Min="1"
+                           Max="100"
+                           Variant="Variant.Outlined"
+                           Margin="Margin.Dense"
+                           HideSpinButtons="false"
+                           OnBlur="@HandleQuantityChanged"
+                           Class="cart-quantity-field" />
+        </MudItem>
+        
+        <!-- Price and Actions -->
+        <MudItem xs="3" Class="text-right">
+            <MudText Typo="Typo.body1" Color="Color.Primary" Class="font-weight-bold">
+                @Item.TotalPrice.ToString("C")
+            </MudText>
+            
+            <div class="cart-item-actions mt-1">
+                <MudIconButton Icon="@Icons.Material.Filled.Edit" 
+                             Size="Size.Small" 
+                             Color="Color.Info"
+                             OnClick="@HandleEditNotes"
+                             Title="Edit Notes" />
+                <MudIconButton Icon="@Icons.Material.Filled.Delete" 
+                             Size="Size.Small" 
+                             Color="Color.Error"
+                             OnClick="@HandleRemove"
+                             Title="Remove Item" />
+            </div>
+        </MudItem>
+    </MudGrid>
+</div>
+
+<style>
+    .pos-cart-item {
+        border-bottom: 1px solid #e0e0e0;
+        padding: 12px 0;
+    }
+    
+    .pos-cart-item:last-child {
+        border-bottom: none;
+    }
+    
+    .cart-quantity-field {
+        max-width: 100px;
+    }
+    
+    .cart-item-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 4px;
+    }
+</style>
+
+@code {
+    [Parameter, EditorRequired]
+    public OrderItemDto Item { get; set; } = null!;
+    
+    [Parameter]
+    public EventCallback<(OrderItemDto item, int newQuantity)> OnQuantityChanged { get; set; }
+    
+    [Parameter]
+    public EventCallback<OrderItemDto> OnRemove { get; set; }
+    
+    [Parameter]
+    public EventCallback<(OrderItemDto item, string notes)> OnNotesChanged { get; set; }
+    
+    private int _quantity;
+    
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        _quantity = Item.Quantity;
+    }
+    
+    private async Task HandleQuantityChanged()
+    {
+        if (_quantity != Item.Quantity && _quantity > 0)
+        {
+            if (OnQuantityChanged.HasDelegate)
+            {
+                await OnQuantityChanged.InvokeAsync((Item, _quantity));
+            }
+        }
+        else if (_quantity <= 0)
+        {
+            // Reset to original quantity if invalid
+            _quantity = Item.Quantity;
+        }
+    }
+    
+    private async Task HandleRemove()
+    {
+        if (OnRemove.HasDelegate)
+        {
+            await OnRemove.InvokeAsync(Item);
+        }
+    }
+    
+    private async Task HandleEditNotes()
+    {
+        // TODO: Open dialog for editing notes
+        // For now, just log
+        Console.WriteLine($"Edit notes for item: {Item.Product?.Name}");
+        
+        // Placeholder: In a real implementation, this would open a dialog
+        // and then call OnNotesChanged with the new notes
+    }
+}

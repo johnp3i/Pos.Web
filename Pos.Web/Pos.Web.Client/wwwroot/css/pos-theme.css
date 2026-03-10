@@ -1,0 +1,214 @@
+/* POS Theme - Matches Legacy WPF POS Colors */
+/* Primary: SteelBlue #4682B4, Secondary: Orange #FFA500 */
+
+:root {
+    /* Primary Colors (SteelBlue) */
+    --mud-palette-primary: #4682B4;
+    --mud-palette-primary-rgb: 70, 130, 180;
+    --mud-palette-primary-text: #ffffff;
+    --mud-palette-primary-darken: #3a6fa0;
+    --mud-palette-primary-lighten: #6a9bc4;
+    
+    /* Secondary Colors (Orange) */
+    --mud-palette-secondary: #FFA500;
+    --mud-palette-secondary-rgb: 255, 165, 0;
+    --mud-palette-secondary-text: #000000;
+    
+    /* Status Colors */
+    --mud-palette-success: #4CAF50;        /* Green */
+    --mud-palette-error: #DC143C;          /* Crimson */
+    --mud-palette-warning: #FFD700;        /* Gold */
+    --mud-palette-info: #1976D2;           /* Blue */
+    
+    /* Background Colors */
+    --mud-palette-background: #f5f5f5;
+    --mud-palette-surface: #ffffff;
+    --mud-palette-drawer-background: #ffffff;
+    --mud-palette-appbar-background: #4682B4;
+    --mud-palette-appbar-text: #ffffff;
+    
+    /* Text Colors */
+    --mud-palette-text-primary: #212121;
+    --mud-palette-text-secondary: #757575;
+    --mud-palette-text-disabled: #BDBDBD;
+}
+
+/* POS-specific component overrides */
+.mud-button-root {
+    text-transform: none;
+    font-weight: 600;
+    border-radius: 8px;
+    font-size: 1rem;
+}
+
+.mud-button-filled-primary {
+    background-color: var(--mud-palette-primary);
+    color: white;
+}
+
+.mud-button-filled-primary:hover {
+    background-color: var(--mud-palette-primary-darken);
+}
+
+.mud-button-filled-secondary {
+    background-color: var(--mud-palette-secondary);
+    color: black;
+}
+
+.mud-button-filled-secondary:hover {
+    background-color: #ff8c00; /* DarkOrange */
+}
+
+/* Product card styling */
+.pos-product-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+    border-radius: 12px;
+}
+
+.pos-product-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.pos-product-card .mud-card-media {
+    height: 120px;
+    object-fit: cover;
+}
+
+/* Cart item styling */
+.pos-cart-item {
+    border-bottom: 1px solid #e0e0e0;
+    padding: 12px 0;
+}
+
+.pos-cart-item:last-child {
+    border-bottom: none;
+}
+
+/* Fullscreen layout */
+.pos-layout {
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* Large touch-friendly buttons */
+.pos-action-button {
+    min-height: 56px;
+    font-size: 1.1rem;
+}
+
+/* Category chips */
+.pos-category-chip {
+    margin: 4px;
+    font-size: 0.95rem;
+}
+
+/* AppBar styling for POS */
+.mud-appbar.pos-appbar {
+    background-color: var(--mud-palette-primary);
+}
+
+/* Navigation menu styling */
+.mud-nav-link {
+    border-radius: 8px;
+    margin: 4px 8px;
+}
+
+.mud-nav-link:hover {
+    background-color: rgba(70, 130, 180, 0.1);
+}
+
+.mud-nav-link-active {
+    background-color: rgba(70, 130, 180, 0.2);
+    color: var(--mud-palette-primary);
+}
+
+/* Table styling */
+.pos-table .mud-table-head {
+    background-color: var(--mud-palette-primary);
+    color: white;
+}
+
+.pos-table .mud-table-row:hover {
+    background-color: rgba(70, 130, 180, 0.05);
+}
+
+/* Badge styling */
+.mud-badge-warning {
+    background-color: var(--mud-palette-warning);
+    color: black;
+}
+
+/* Dialog styling */
+.mud-dialog {
+    border-radius: 12px;
+}
+
+/* Snackbar styling */
+.mud-snackbar-content-message {
+    font-size: 1rem;
+}
+
+/* Input field styling */
+.mud-input-root {
+    border-radius: 8px;
+}
+
+/* Card styling */
+.mud-card {
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .pos-action-button {
+        min-height: 48px;
+        font-size: 1rem;
+    }
+    
+    .pos-product-card .mud-card-media {
+        height: 100px;
+    }
+}
+
+/* Touch-friendly spacing */
+.pos-area {
+    padding: 8px;
+}
+
+/* High contrast for readability */
+.pos-text-primary {
+    color: var(--mud-palette-text-primary);
+    font-weight: 500;
+}
+
+.pos-text-secondary {
+    color: var(--mud-palette-text-secondary);
+}
+
+/* Loading indicator */
+.pos-loading {
+    color: var(--mud-palette-primary);
+}
+
+
+/* ===== Pending Orders Page Styles ===== */
+.pending-order-card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.pending-order-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+.pending-order-card .mud-card-header {
+    background-color: var(--mud-palette-background-grey);
+}
+
+.pending-order-card .mud-card-actions {
+    padding: 16px;
+    background-color: var(--mud-palette-background);
+}

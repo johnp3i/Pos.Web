@@ -1,0 +1,215 @@
+@inject IDispatcher Dispatcher
+
+<MudCard Elevation="2">
+    <MudCardHeader>
+        <CardHeaderContent>
+            <MudText Typo="Typo.h6">
+                @(IsEditMode ? "Edit Customer" : "New Customer")
+            </MudText>
+        </CardHeaderContent>
+    </MudCardHeader>
+    
+    <MudCardContent>
+        <MudForm @ref="_form" @bind-IsValid="@_isValid">
+            <MudGrid Spacing="2">
+                <!-- Name -->
+                <MudItem xs="12">
+                    <MudTextField @bind-Value="_customer.Name"
+                                Label="Customer Name"
+                                Variant="Variant.Outlined"
+                                Required="true"
+                                RequiredError="Name is required"
+                                MaxLength="100" />
+                </MudItem>
+                
+                <!-- Telephone -->
+                <MudItem xs="12" sm="6">
+                    <MudTextField @bind-Value="_customer.Telephone"
+                                Label="Telephone"
+                                Variant="Variant.Outlined"
+                                Required="true"
+                                RequiredError="Telephone is required"
+                                MaxLength="20"
+                                InputType="InputType.Telephone" />
+                </MudItem>
+                
+                <!-- Email -->
+                <MudItem xs="12" sm="6">
+                    <MudTextField @bind-Value="_customer.Email"
+                                Label="Email (Optional)"
+                                Variant="Variant.Outlined"
+                                MaxLength="100"
+                                InputType="InputType.Email" />
+                </MudItem>
+                
+                <!-- Address Line 1 -->
+                <MudItem xs="12">
+                    <MudTextField @bind-Value="_addressLine1"
+                                Label="Address Line 1"
+                                Variant="Variant.Outlined"
+                                MaxLength="200" />
+                </MudItem>
+                
+                <!-- Address Line 2 -->
+                <MudItem xs="12">
+                    <MudTextField @bind-Value="_addressLine2"
+                                Label="Address Line 2 (Optional)"
+                                Variant="Variant.Outlined"
+                                MaxLength="200" />
+                </MudItem>
+                
+                <!-- City and Postal Code -->
+                <MudItem xs="12" sm="6">
+                    <MudTextField @bind-Value="_city"
+                                Label="City"
+                                Variant="Variant.Outlined"
+                                MaxLength="100" />
+                </MudItem>
+                
+                <MudItem xs="12" sm="6">
+                    <MudTextField @bind-Value="_postalCode"
+                                Label="Postal Code"
+                                Variant="Variant.Outlined"
+                                MaxLength="20" />
+                </MudItem>
+            </MudGrid>
+        </MudForm>
+    </MudCardContent>
+    
+    <MudCardActions>
+        <MudButton Variant="Variant.Text" 
+                 Color="Color.Default" 
+                 OnClick="@HandleCancel">
+            Cancel
+        </MudButton>
+        <MudSpacer />
+        <MudButton Variant="Variant.Filled" 
+                 Color="Color.Primary" 
+                 Disabled="@(!_isValid || _isSaving)"
+                 OnClick="@HandleSave">
+            @if (_isSaving)
+            {
+                <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mr-2" />
+                <text>Saving...</text>
+            }
+            else
+            {
+                <text>@(IsEditMode ? "Update" : "Create")</text>
+            }
+        </MudButton>
+    </MudCardActions>
+</MudCard>
+
+@code {
+    [Parameter]
+    public CustomerDto? Customer { get; set; }
+    
+    [Parameter]
+    public EventCallback<CustomerDto> OnSave { get; set; }
+    
+    [Parameter]
+    public EventCallback OnCancel { get; set; }
+    
+    private MudForm _form = null!;
+    private bool _isValid;
+    private bool _isSaving;
+    
+    private CustomerDto _customer = new();
+    private string? _addressLine1;
+    private string? _addressLine2;
+    private string? _city;
+    private string? _postalCode;
+    
+    private bool IsEditMode => Customer != null && Customer.Id > 0;
+    
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        
+        if (Customer != null)
+        {
+            // Clone customer for editing
+            _customer = new CustomerDto
+            {
+                Id = Customer.Id,
+                Name = Customer.Name,
+                Telephone = Customer.Telephone,
+                Email = Customer.Email,
+                LoyaltyPoints = Customer.LoyaltyPoints,
+                TotalOrders = Customer.TotalOrders,
+                TotalSpent = Customer.TotalSpent,
+                LastOrderDate = Customer.LastOrderDate,
+                CreatedAt = Customer.CreatedAt,
+                IsActive = Customer.IsActive
+            };
+            
+            // Load first address if exists
+            if (Customer.Addresses.Any())
+            {
+                var address = Customer.Addresses.First();
+                _addressLine1 = address.AddressLine1;
+                _addressLine2 = address.AddressLine2;
+                _city = address.City;
+                _postalCode = address.PostalCode;
+            }
+        }
+        else
+        {
+            _customer = new CustomerDto
+            {
+                IsActive = true,
+                CreatedAt = DateTime.Now
+            };
+        }
+    }
+    
+    private async Task HandleSave()
+    {
+        await _form.Validate();
+        
+        if (!_isValid)
+        {
+            return;
+        }
+        
+        _isSaving = true;
+        
+        try
+        {
+            // Add address if provided
+            if (!string.IsNullOrWhiteSpace(_addressLine1))
+            {
+                _customer.Addresses.Add(new CustomerAddressDto
+                {
+                    AddressLine1 = _addressLine1,
+                    AddressLine2 = _addressLine2,
+                    City = _city,
+                    PostalCode = _postalCode,
+                    IsDefault = true
+                });
+            }
+            
+            if (OnSave.HasDelegate)
+            {
+                await OnSave.InvokeAsync(_customer);
+            }
+            else
+            {
+                // Default action: Dispatch create customer action
+                Dispatcher.Dispatch(new CustomerActions.CreateCustomerAction(_customer));
+            }
+        }
+        finally
+        {
+            _isSaving = false;
+        }
+    }
+    
+    private async Task HandleCancel()
+    {
+        if (OnCancel.HasDelegate)
+        {
+            await OnCancel.InvokeAsync();
+        }
+    }
+}

@@ -1,0 +1,80 @@
+@inherits LayoutComponentBase
+@inject IAuthenticationService AuthService
+@inject NavigationManager Navigation
+
+<MudThemeProvider Theme="@_adminTheme" />
+<MudPopoverProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<MudLayout>
+    <!-- App Bar -->
+    <MudAppBar Elevation="1" Class="admin-appbar">
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@ToggleDrawer" />
+        <MudText Typo="Typo.h6">MyChair POS - Admin</MudText>
+        <MudSpacer />
+        <MudIconButton Icon="@Icons.Material.Filled.Notifications" Color="Color.Inherit" />
+        <MudMenu Icon="@Icons.Material.Filled.AccountCircle" Color="Color.Inherit">
+            <MudMenuItem Icon="@Icons.Material.Filled.Person">Profile</MudMenuItem>
+            <MudMenuItem Icon="@Icons.Material.Filled.Settings">Settings</MudMenuItem>
+            <MudDivider />
+            <MudMenuItem Icon="@Icons.Material.Filled.Logout" OnClick="Logout">Logout</MudMenuItem>
+        </MudMenu>
+    </MudAppBar>
+    
+    <!-- Drawer (Sidebar) -->
+    <MudDrawer @bind-Open="@_drawerOpen" Elevation="2" ClipMode="DrawerClipMode.Always" Class="admin-sidebar">
+        <MudDrawerHeader>
+            <MudText Typo="Typo.h6" Color="Color.Surface">Navigation</MudText>
+        </MudDrawerHeader>
+        <MudNavMenu>
+            <MudNavLink Href="/admin/dashboard" Icon="@Icons.Material.Filled.Dashboard">Dashboard</MudNavLink>
+            <MudNavLink Href="/admin/users" Icon="@Icons.Material.Filled.People">Users</MudNavLink>
+            <MudNavLink Href="/admin/products" Icon="@Icons.Material.Filled.Inventory">Products</MudNavLink>
+            <MudNavLink Href="/admin/customers" Icon="@Icons.Material.Filled.PersonSearch">Customers</MudNavLink>
+            <MudNavGroup Title="Reports" Icon="@Icons.Material.Filled.Assessment">
+                <MudNavLink Href="/admin/reports/sales">Sales</MudNavLink>
+                <MudNavLink Href="/admin/reports/inventory">Inventory</MudNavLink>
+                <MudNavLink Href="/admin/reports/performance">Performance</MudNavLink>
+            </MudNavGroup>
+            <MudNavGroup Title="Settings" Icon="@Icons.Material.Filled.Settings">
+                <MudNavLink Href="/admin/settings/general">General</MudNavLink>
+                <MudNavLink Href="/admin/settings/printers">Printers</MudNavLink>
+                <MudNavLink Href="/admin/settings/taxes">Taxes</MudNavLink>
+            </MudNavGroup>
+        </MudNavMenu>
+    </MudDrawer>
+    
+    <!-- Main Content -->
+    <MudMainContent>
+        @Body
+    </MudMainContent>
+</MudLayout>
+
+@code {
+    private bool _drawerOpen = true;
+    
+    private MudTheme _adminTheme = new MudTheme()
+    {
+        PaletteLight = new PaletteLight()
+        {
+            Primary = "#1976D2",      // Material Blue
+            Secondary = "#424242",    // Material Gray
+            Success = "#4CAF50",      // Material Green
+            Error = "#F44336",        // Material Red
+            Warning = "#FF9800",      // Material Orange
+            Info = "#2196F3"          // Material Light Blue
+        }
+    };
+    
+    private void ToggleDrawer()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+    
+    private async Task Logout()
+    {
+        await AuthService.LogoutAsync();
+        Navigation.NavigateTo("/identity/login");
+    }
+}

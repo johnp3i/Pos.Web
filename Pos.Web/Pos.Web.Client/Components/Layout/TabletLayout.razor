@@ -1,0 +1,182 @@
+@inherits LayoutComponentBase
+
+<MudThemeProvider Theme="_theme" />
+<MudPopoverProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<div class="tablet-layout">
+    <!-- Compact Header for Tablets -->
+    <div class="tablet-header">
+        <MudPaper Elevation="2" Class="pa-2">
+            <MudGrid Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+                <MudItem xs="2">
+                    <MudIconButton Icon="@Icons.Material.Filled.Menu" 
+                                 Color="Color.Primary" 
+                                 Size="Size.Large"
+                                 OnClick="@ToggleDrawer" />
+                </MudItem>
+                <MudItem xs="8" Class="text-center">
+                    <MudText Typo="Typo.h6" Color="Color.Primary">
+                        <MudIcon Icon="@Icons.Material.Filled.TableRestaurant" Class="mr-1" />
+                        Waiter Station
+                    </MudText>
+                </MudItem>
+                <MudItem xs="2" Class="text-right">
+                    <AuthorizeView>
+                        <Authorized>
+                            <MudIconButton Icon="@Icons.Material.Filled.Person" 
+                                         Color="Color.Primary" 
+                                         Size="Size.Large"
+                                         OnClick="@ShowUserMenu" />
+                        </Authorized>
+                    </AuthorizeView>
+                </MudItem>
+            </MudGrid>
+        </MudPaper>
+    </div>
+    
+    <!-- Drawer for Navigation -->
+    <MudDrawer @bind-Open="_drawerOpen" 
+               Anchor="Anchor.Left" 
+               Elevation="2" 
+               Variant="DrawerVariant.Temporary">
+        <MudDrawerHeader>
+            <MudText Typo="Typo.h6">Menu</MudText>
+        </MudDrawerHeader>
+        <MudNavMenu>
+            <MudNavLink Href="/waiter" 
+                       Icon="@Icons.Material.Filled.TableRestaurant" 
+                       IconColor="Color.Primary">
+                New Order
+            </MudNavLink>
+            <MudNavLink Href="/pending-orders" 
+                       Icon="@Icons.Material.Filled.History" 
+                       IconColor="Color.Info">
+                Pending Orders
+            </MudNavLink>
+            <MudNavLink Href="/kitchen-status" 
+                       Icon="@Icons.Material.Filled.Restaurant" 
+                       IconColor="Color.Success">
+                Kitchen Status
+            </MudNavLink>
+            <MudDivider Class="my-2" />
+            <MudNavLink Href="/settings" 
+                       Icon="@Icons.Material.Filled.Settings" 
+                       IconColor="Color.Default">
+                Settings
+            </MudNavLink>
+            <MudNavLink Href="/logout" 
+                       Icon="@Icons.Material.Filled.ExitToApp" 
+                       IconColor="Color.Error">
+                Logout
+            </MudNavLink>
+        </MudNavMenu>
+    </MudDrawer>
+    
+    <!-- Main Content Area - Touch Optimized -->
+    <div class="tablet-content">
+        @Body
+    </div>
+    
+    <!-- Floating Action Button for Quick Actions -->
+    <div class="tablet-fab">
+        <MudFab Color="Color.Secondary" 
+                StartIcon="@Icons.Material.Filled.Add" 
+                Size="Size.Large"
+                OnClick="@QuickNewOrder"
+                Title="New Order" />
+    </div>
+    
+    <!-- Offline Indicator -->
+    @if (!_isOnline)
+    {
+        <div class="offline-indicator">
+            <MudChip T="string" Icon="@Icons.Material.Filled.CloudOff" Color="Color.Warning" Size="Size.Large">
+                Offline Mode
+            </MudChip>
+        </div>
+    }
+</div>
+
+<style>
+    .tablet-layout {
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        overflow: hidden;
+        position: relative;
+    }
+    
+    .tablet-header {
+        flex-shrink: 0;
+    }
+    
+    .tablet-content {
+        flex: 1;
+        overflow: auto;
+        padding: 12px;
+        /* Touch-friendly spacing */
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .tablet-fab {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 1000;
+    }
+    
+    .offline-indicator {
+        position: fixed;
+        top: 70px;
+        right: 16px;
+        z-index: 1001;
+    }
+    
+    /* Touch-friendly button sizing */
+    .tablet-layout .mud-button-root {
+        min-height: 56px;
+        font-size: 1.1rem;
+    }
+    
+    .tablet-layout .mud-icon-button {
+        width: 56px;
+        height: 56px;
+    }
+</style>
+
+@code {
+    private bool _drawerOpen = false;
+    private bool _isOnline = true; // TODO: Connect to actual online/offline detection
+    
+    private MudTheme _theme = new()
+    {
+        PaletteLight = new PaletteLight
+        {
+            Primary = "#4682B4",        // SteelBlue
+            Secondary = "#FFA500",      // Orange
+            Success = "#4CAF50",        // Green
+            Error = "#DC143C",          // Crimson
+            Warning = "#FFD700",        // Gold
+            Info = "#1976D2"            // Blue
+        }
+    };
+    
+    private void ToggleDrawer()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+    
+    private void ShowUserMenu()
+    {
+        // TODO: Implement user menu dialog
+        Console.WriteLine("Show user menu");
+    }
+    
+    private void QuickNewOrder()
+    {
+        // TODO: Navigate to new order page
+        Console.WriteLine("Quick new order");
+    }
+}

@@ -1,0 +1,165 @@
+@inject IDispatcher Dispatcher
+
+<MudCard Elevation="2" Class="customer-card">
+    <MudCardHeader>
+        <CardHeaderAvatar>
+            <MudAvatar Color="Color.Primary" Size="Size.Large">
+                @Customer.Name.Substring(0, 1).ToUpper()
+            </MudAvatar>
+        </CardHeaderAvatar>
+        <CardHeaderContent>
+            <MudText Typo="Typo.h6">@Customer.Name</MudText>
+            <MudText Typo="Typo.body2" Color="Color.Secondary">
+                Customer #@Customer.Id
+            </MudText>
+        </CardHeaderContent>
+        <CardHeaderActions>
+            @if (ShowActions)
+            {
+                <MudIconButton Icon="@Icons.Material.Filled.Edit" 
+                             Color="Color.Info" 
+                             OnClick="@HandleEdit"
+                             Title="Edit Customer" />
+                <MudIconButton Icon="@Icons.Material.Filled.Close" 
+                             Color="Color.Default" 
+                             OnClick="@HandleRemove"
+                             Title="Remove Customer" />
+            }
+        </CardHeaderActions>
+    </MudCardHeader>
+    
+    <MudCardContent>
+        <!-- Contact Information -->
+        <MudGrid Spacing="1">
+            <MudItem xs="12">
+                <MudText Typo="Typo.body2">
+                    <MudIcon Icon="@Icons.Material.Filled.Phone" Size="Size.Small" Class="mr-1" />
+                    @Customer.Telephone
+                </MudText>
+            </MudItem>
+            
+            @if (!string.IsNullOrEmpty(Customer.Email))
+            {
+                <MudItem xs="12">
+                    <MudText Typo="Typo.body2">
+                        <MudIcon Icon="@Icons.Material.Filled.Email" Size="Size.Small" Class="mr-1" />
+                        @Customer.Email
+                    </MudText>
+                </MudItem>
+            }
+            
+            <!-- Addresses -->
+            @if (Customer.Addresses.Any())
+            {
+                <MudItem xs="12">
+                    <MudText Typo="Typo.body2">
+                        <MudIcon Icon="@Icons.Material.Filled.LocationOn" Size="Size.Small" Class="mr-1" />
+                        @Customer.Addresses.First().AddressLine1
+                    </MudText>
+                    @if (Customer.Addresses.Count > 1)
+                    {
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">
+                            +@(Customer.Addresses.Count - 1) more address(es)
+                        </MudText>
+                    }
+                </MudItem>
+            }
+        </MudGrid>
+        
+        <MudDivider Class="my-2" />
+        
+        <!-- Customer Stats -->
+        <MudGrid Spacing="2">
+            <MudItem xs="4" Class="text-center">
+                <MudText Typo="Typo.h6" Color="Color.Primary">@Customer.TotalOrders</MudText>
+                <MudText Typo="Typo.caption">Orders</MudText>
+            </MudItem>
+            <MudItem xs="4" Class="text-center">
+                <MudText Typo="Typo.h6" Color="Color.Success">@Customer.TotalSpent.ToString("C")</MudText>
+                <MudText Typo="Typo.caption">Spent</MudText>
+            </MudItem>
+            <MudItem xs="4" Class="text-center">
+                <MudText Typo="Typo.h6" Color="Color.Warning">@Customer.LoyaltyPoints</MudText>
+                <MudText Typo="Typo.caption">Points</MudText>
+            </MudItem>
+        </MudGrid>
+        
+        <!-- Last Order -->
+        @if (Customer.LastOrderDate.HasValue)
+        {
+            <MudDivider Class="my-2" />
+            <MudText Typo="Typo.caption" Color="Color.Secondary">
+                Last order: @Customer.LastOrderDate.Value.ToString("MMM dd, yyyy")
+            </MudText>
+        }
+    </MudCardContent>
+    
+    @if (ShowActions)
+    {
+        <MudCardActions>
+            <MudButton Variant="Variant.Text" 
+                     Color="Color.Primary" 
+                     StartIcon="@Icons.Material.Filled.History"
+                     OnClick="@HandleViewHistory">
+                View History
+            </MudButton>
+        </MudCardActions>
+    }
+</MudCard>
+
+<style>
+    .customer-card {
+        margin-bottom: 16px;
+    }
+</style>
+
+@code {
+    [Parameter, EditorRequired]
+    public CustomerDto Customer { get; set; } = null!;
+    
+    [Parameter]
+    public bool ShowActions { get; set; } = true;
+    
+    [Parameter]
+    public EventCallback<CustomerDto> OnEdit { get; set; }
+    
+    [Parameter]
+    public EventCallback OnRemove { get; set; }
+    
+    [Parameter]
+    public EventCallback<CustomerDto> OnViewHistory { get; set; }
+    
+    private async Task HandleEdit()
+    {
+        if (OnEdit.HasDelegate)
+        {
+            await OnEdit.InvokeAsync(Customer);
+        }
+    }
+    
+    private async Task HandleRemove()
+    {
+        if (OnRemove.HasDelegate)
+        {
+            await OnRemove.InvokeAsync();
+        }
+        else
+        {
+            // Default action: Clear selected customer
+            Dispatcher.Dispatch(new CustomerActions.ClearSelectedCustomerAction());
+        }
+    }
+    
+    private async Task HandleViewHistory()
+    {
+        if (OnViewHistory.HasDelegate)
+        {
+            await OnViewHistory.InvokeAsync(Customer);
+        }
+        else
+        {
+            // Default action: Load customer history
+            Dispatcher.Dispatch(new CustomerActions.LoadCustomerHistoryAction(Customer.Id));
+        }
+    }
+}

@@ -1,0 +1,64 @@
+@inherits FluxorComponent
+@inject IState<ProductCatalogState> ProductCatalogState
+@inject IDispatcher Dispatcher
+
+<div class="product-grid-container">
+    <!-- Category Filter -->
+    <div class="mb-3">
+        <CategoryFilter />
+    </div>
+    
+    <!-- Product Search -->
+    <div class="mb-3">
+        <ProductSearch />
+    </div>
+    
+    <!-- Loading Indicator -->
+    @if (ProductCatalogState.Value.IsLoadingProducts)
+    {
+        <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="mb-3" />
+    }
+    
+    <!-- Product Grid -->
+    @if (ProductCatalogState.Value.FilteredProducts.Any())
+    {
+        <MudGrid Spacing="2">
+            @foreach (var product in ProductCatalogState.Value.FilteredProducts)
+            {
+                <MudItem xs="6" sm="4" md="3" lg="2">
+                    <ProductCard Product="@product" OnProductSelected="@HandleProductSelected" />
+                </MudItem>
+            }
+        </MudGrid>
+    }
+    else if (!ProductCatalogState.Value.IsLoadingProducts)
+    {
+        <MudAlert Severity="Severity.Info" Class="mt-4">
+            No products found. Try adjusting your search or category filter.
+        </MudAlert>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public EventCallback<ProductDto> OnProductSelected { get; set; }
+    
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        
+        // Load products if not already loaded
+        if (!ProductCatalogState.Value.Products.Any() && !ProductCatalogState.Value.IsLoadingProducts)
+        {
+            Dispatcher.Dispatch(new ProductCatalogActions.LoadProductsAction());
+        }
+    }
+    
+    private async Task HandleProductSelected(ProductDto product)
+    {
+        if (OnProductSelected.HasDelegate)
+        {
+            await OnProductSelected.InvokeAsync(product);
+        }
+    }
+}

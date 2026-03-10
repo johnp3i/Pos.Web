@@ -1,0 +1,223 @@
+/* Identity Theme - Minimal Login/Register */
+/* Clean, distraction-free authentication pages */
+
+:root {
+    /* Primary Colors */
+    --mud-palette-primary: #1976D2;
+    --mud-palette-primary-rgb: 25, 118, 210;
+    --mud-palette-primary-text: #ffffff;
+    --mud-palette-primary-darken: #1565C0;
+    --mud-palette-primary-lighten: #42A5F5;
+    
+    /* Background Colors */
+    --mud-palette-background: #f5f5f5;
+    --mud-palette-surface: #ffffff;
+    
+    /* Text Colors */
+    --mud-palette-text-primary: #212121;
+    --mud-palette-text-secondary: #757575;
+}
+
+/* Identity layout with gradient background */
+.identity-layout {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+}
+
+/* Identity card container */
+.identity-card {
+    max-width: 400px;
+    width: 100%;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    background: white;
+    padding: 32px;
+}
+
+/* Logo container */
+.identity-logo {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.identity-logo img {
+    max-width: 120px;
+    height: auto;
+}
+
+/* Form styling */
+.identity-form .mud-input-root {
+    margin-bottom: 16px;
+}
+
+/* Button styling */
+.identity-button {
+    width: 100%;
+    height: 48px;
+    font-size: 1.1rem;
+    text-transform: none;
+    font-weight: 600;
+    border-radius: 8px;
+}
+
+/* Link styling */
+.identity-link {
+    color: var(--mud-palette-primary);
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.identity-link:hover {
+    text-decoration: underline;
+}
+
+/* Title styling */
+.identity-title {
+    text-align: center;
+    margin-bottom: 24px;
+    color: var(--mud-palette-text-primary);
+    font-weight: 500;
+}
+
+/* Subtitle styling */
+.identity-subtitle {
+    text-align: center;
+    margin-bottom: 16px;
+    color: var(--mud-palette-text-secondary);
+    font-size: 0.9rem;
+}
+
+/* Divider with text */
+.identity-divider {
+    display: flex;
+    align-items: center;
+    margin: 24px 0;
+}
+
+.identity-divider::before,
+.identity-divider::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.identity-divider span {
+    padding: 0 16px;
+    color: var(--mud-palette-text-secondary);
+    font-size: 0.9rem;
+}
+
+/* Alert styling */
+.identity-alert {
+    margin-bottom: 16px;
+    border-radius: 8px;
+}
+
+/* Checkbox styling */
+.identity-checkbox {
+    margin-bottom: 16px;
+}
+
+/* Footer links */
+.identity-footer {
+    text-align: center;
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid #e0e0e0;
+}
+
+/* Social login buttons */
+.identity-social-button {
+    width: 100%;
+    margin-bottom: 8px;
+    text-transform: none;
+    border-radius: 8px;
+}
+
+/* Loading overlay */
+.identity-loading {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 16px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+    .identity-card {
+        padding: 24px;
+    }
+    
+    .identity-button {
+        height: 44px;
+        font-size: 1rem;
+    }
+}
+
+/* Animation for card entrance */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.identity-card {
+    animation: fadeInUp 0.5s ease-out;
+}
+
+/* Input focus styling */
+.identity-form .mud-input-root:focus-within {
+    box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
+}
+
+/* Error message styling */
+.identity-error {
+    color: #F44336;
+    font-size: 0.875rem;
+    margin-top: 4px;
+}
+
+/* Success message styling */
+.identity-success {
+    color: #4CAF50;
+    font-size: 0.875rem;
+    margin-top: 4px;
+}
+
+/* Password strength indicator */
+.identity-password-strength {
+    height: 4px;
+    border-radius: 2px;
+    margin-top: 8px;
+    transition: all 0.3s ease;
+}
+
+.identity-password-strength.weak {
+    background-color: #F44336;
+    width: 33%;
+}
+
+.identity-password-strength.medium {
+    background-color: #FF9800;
+    width: 66%;
+}
+
+.identity-password-strength.strong {
+    background-color: #4CAF50;
+    width: 100%;
+}

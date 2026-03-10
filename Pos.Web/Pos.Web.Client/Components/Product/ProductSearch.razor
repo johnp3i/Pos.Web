@@ -1,0 +1,98 @@
+@inherits FluxorComponent
+@inject IState<ProductCatalogState> ProductCatalogState
+@inject IDispatcher Dispatcher
+
+<MudAutocomplete T="ProductDto" 
+                 Label="Search Products" 
+                 @bind-Value="_selectedProduct"
+                 SearchFunc="@SearchProducts"
+                 ToStringFunc="@(p => p?.Name ?? string.Empty)"
+                 Variant="Variant.Outlined"
+                 AdornmentIcon="@Icons.Material.Filled.Search"
+                 AdornmentColor="Color.Primary"
+                 Clearable="true"
+                 ResetValueOnEmptyText="true"
+                 CoerceText="false"
+                 CoerceValue="false"
+                 OnClearButtonClick="@ClearSearch"
+                 Class="product-search">
+    <ItemTemplate Context="product">
+        <MudGrid Spacing="1" AlignItems="AlignItems.Center">
+            <MudItem xs="2">
+                <MudAvatar Image="@GetProductImage(product)" Size="Size.Small" />
+            </MudItem>
+            <MudItem xs="7">
+                <MudText Typo="Typo.body2">@product.Name</MudText>
+                @if (!string.IsNullOrEmpty(product.Barcode))
+                {
+                    <MudText Typo="Typo.caption" Color="Color.Secondary">
+                        @product.Barcode
+                    </MudText>
+                }
+            </MudItem>
+            <MudItem xs="3" Class="text-right">
+                <MudText Typo="Typo.body2" Color="Color.Primary">
+                    @product.Price.ToString("C")
+                </MudText>
+            </MudItem>
+        </MudGrid>
+    </ItemTemplate>
+</MudAutocomplete>
+
+@code {
+    private ProductDto? _selectedProduct;
+    
+    [Parameter]
+    public EventCallback<ProductDto> OnProductSelected { get; set; }
+    
+    private async Task<IEnumerable<ProductDto>> SearchProducts(string searchText, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(searchText) || searchText.Length < 2)
+        {
+            return Enumerable.Empty<ProductDto>();
+        }
+        
+        // Dispatch search action
+        Dispatcher.Dispatch(new ProductCatalogActions.SearchProductsAction(searchText));
+        
+        // Return filtered products from state
+        var searchLower = searchText.ToLower();
+        return ProductCatalogState.Value.Products
+            .Where(p => p.IsAvailable && p.IsInStock)
+            .Where(p => 
+                p.Name.ToLower().Contains(searchLower) ||
+                (p.Description?.ToLower().Contains(searchLower) ?? false) ||
+                (p.Barcode?.ToLower().Contains(searchLower) ?? false))
+            .OrderBy(p => p.DisplayOrder)
+            .ThenBy(p => p.Name)
+            .Take(10);
+    }
+    
+    private void ClearSearch()
+    {
+        _selectedProduct = null;
+        Dispatcher.Dispatch(new ProductCatalogActions.SearchProductsAction(string.Empty));
+    }
+    
+    private string GetProductImage(ProductDto product)
+    {
+        if (!string.IsNullOrEmpty(product.ImageUrl))
+        {
+            return product.ImageUrl;
+        }
+        
+        return "/images/product-placeholder.png";
+    }
+    
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        
+        // When a product is selected, notify parent and clear selection
+        if (_selectedProduct != null && OnProductSelected.HasDelegate)
+        {
+            OnProductSelected.InvokeAsync(_selectedProduct);
+            _selectedProduct = null;
+        }
+    }
+}

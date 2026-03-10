@@ -1,0 +1,133 @@
+<div class="cart-summary">
+    <!-- Subtotal -->
+    <MudGrid Spacing="1" Class="summary-row">
+        <MudItem xs="6">
+            <MudText Typo="Typo.body2">Subtotal:</MudText>
+        </MudItem>
+        <MudItem xs="6" Class="text-right">
+            <MudText Typo="Typo.body2">@Order.Subtotal.ToString("C")</MudText>
+        </MudItem>
+    </MudGrid>
+    
+    <!-- Tax -->
+    <MudGrid Spacing="1" Class="summary-row">
+        <MudItem xs="6">
+            <MudText Typo="Typo.body2">Tax (10%):</MudText>
+        </MudItem>
+        <MudItem xs="6" Class="text-right">
+            <MudText Typo="Typo.body2">@Order.TaxAmount.ToString("C")</MudText>
+        </MudItem>
+    </MudGrid>
+    
+    <!-- Discount (if applied) -->
+    @if (Order.DiscountPercentage.HasValue || Order.DiscountAmount.HasValue)
+    {
+        <MudGrid Spacing="1" Class="summary-row">
+            <MudItem xs="6">
+                <MudText Typo="Typo.body2" Color="Color.Success">
+                    Discount
+                    @if (Order.DiscountPercentage.HasValue)
+                    {
+                        <text>(@Order.DiscountPercentage.Value%)</text>
+                    }:
+                </MudText>
+            </MudItem>
+            <MudItem xs="6" Class="text-right">
+                <MudText Typo="Typo.body2" Color="Color.Success">
+                    -@GetDiscountAmount().ToString("C")
+                </MudText>
+            </MudItem>
+        </MudGrid>
+    }
+    
+    <!-- Voucher (if applied) -->
+    @if (Order.VoucherId.HasValue)
+    {
+        <MudGrid Spacing="1" Class="summary-row">
+            <MudItem xs="6">
+                <MudText Typo="Typo.body2" Color="Color.Success">
+                    <MudIcon Icon="@Icons.Material.Filled.CardGiftcard" Size="Size.Small" />
+                    Voucher:
+                </MudText>
+            </MudItem>
+            <MudItem xs="6" Class="text-right">
+                <MudText Typo="Typo.body2" Color="Color.Success">
+                    Applied
+                </MudText>
+            </MudItem>
+        </MudGrid>
+    }
+    
+    <MudDivider Class="my-2" />
+    
+    <!-- Total -->
+    <MudGrid Spacing="1" Class="summary-row">
+        <MudItem xs="6">
+            <MudText Typo="Typo.h6" Color="Color.Primary">Total:</MudText>
+        </MudItem>
+        <MudItem xs="6" Class="text-right">
+            <MudText Typo="Typo.h6" Color="Color.Primary" Class="font-weight-bold">
+                @Order.TotalAmount.ToString("C")
+            </MudText>
+        </MudItem>
+    </MudGrid>
+    
+    <!-- Amount Paid and Change (if payment in progress) -->
+    @if (Order.AmountPaid.HasValue)
+    {
+        <MudDivider Class="my-2" />
+        
+        <MudGrid Spacing="1" Class="summary-row">
+            <MudItem xs="6">
+                <MudText Typo="Typo.body2">Amount Paid:</MudText>
+            </MudItem>
+            <MudItem xs="6" Class="text-right">
+                <MudText Typo="Typo.body2">@Order.AmountPaid.Value.ToString("C")</MudText>
+            </MudItem>
+        </MudGrid>
+        
+        @if (Order.ChangeAmount.HasValue && Order.ChangeAmount.Value > 0)
+        {
+            <MudGrid Spacing="1" Class="summary-row">
+                <MudItem xs="6">
+                    <MudText Typo="Typo.body1" Color="Color.Success">Change:</MudText>
+                </MudItem>
+                <MudItem xs="6" Class="text-right">
+                    <MudText Typo="Typo.body1" Color="Color.Success" Class="font-weight-bold">
+                        @Order.ChangeAmount.Value.ToString("C")
+                    </MudText>
+                </MudItem>
+            </MudGrid>
+        }
+    }
+</div>
+
+<style>
+    .cart-summary {
+        padding: 8px 0;
+    }
+    
+    .summary-row {
+        margin-bottom: 4px;
+    }
+</style>
+
+@code {
+    [Parameter, EditorRequired]
+    public OrderDto Order { get; set; } = null!;
+    
+    private decimal GetDiscountAmount()
+    {
+        if (Order.DiscountAmount.HasValue)
+        {
+            return Order.DiscountAmount.Value;
+        }
+        
+        if (Order.DiscountPercentage.HasValue)
+        {
+            return Order.Subtotal * (Order.DiscountPercentage.Value / 100m);
+        }
+        
+        return 0m;
+    }
+}

@@ -1,0 +1,88 @@
+MyChair POS - Migrated Users Temporary Passwords
+Generated: 2026-03-04 10:39:18
+================================================================================
+
+IMPORTANT: Distribute these passwords securely to users.
+Users will be required to change their password on first login.
+
+--------------------------------------------------------------------------------
+
+User: Admin Admin
+Username: Admin
+Role: Admin
+Temporary Password: >FR47o&731Be
+NewPassword": NewSecure123!@#,
+Legacy User ID: 1
+Identity User ID: cb5cc97b-bc7c-49a8-84ff-fc66ae1f3e55
+
+User: Cashier Cashier
+Username: Cashier
+Role: Manager
+Temporary Password: >2t@JO?eJfVx
+NewPassword": NewSecure123!@#,
+Legacy User ID: 5
+Identity User ID: b46d43f4-e9d8-489b-9e27-54864ead15b4
+
+User: Costas Costantinou
+Username: Costas
+Role: Cashier
+Temporary Password: x>viVYU3CU5n
+Legacy User ID: 6
+Identity User ID: fb2014de-c825-4e71-a6a3-afe127d2dca1
+
+User: Ioanna Ioanna
+Username: Ioanna
+Role: Manager
+Temporary Password: C&Yr-bIre8OR
+Legacy User ID: 7
+Identity User ID: 50180877-ff28-47c4-a2e4-b0c1379e6dce
+
+User: Elena Sis Costantinou
+Username: Elena Sis
+Role: Manager
+Temporary Password: 79<U7px}g26m
+Legacy User ID: 8
+Identity User ID: df0f5b61-0ea4-451a-a3dd-9ab6da27342b
+
+User: Lefteris Lefteris
+Username: Lefteris
+Role: Manager
+Temporary Password: 4W1vU;OuPLBF
+Legacy User ID: 10
+Identity User ID: 098a951b-81cf-43a5-94e6-35c46484746c
+
+User: Eleni Eleni
+Username: Eleni
+Role: Manager
+Temporary Password: lD[a.lx!+kh0
+Legacy User ID: 14
+Identity User ID: 66f425e9-221f-4aff-a8ab-b724896652cc
+
+User: Nikos Ktimatias
+Username: Nikos
+Role: Manager
+Temporary Password: 4-IPYw&K#.(*
+Legacy User ID: 16
+Identity User ID: 8b59dc2c-afe0-421b-b543-d0ca1d25aba6
+
+User: Elena M Manoli
+Username: Elena M
+Role: Manager
+Temporary Password: Rz3w>a4-Q.dP
+Legacy User ID: 17
+Identity User ID: 83899d5f-021e-49c4-a441-8c06b744a1f8
+
+User: Vangelis Baria
+Username: Vangelis
+Role: Manager
+Temporary Password: w8):Xp>dRy1)
+Legacy User ID: 18
+Identity User ID: 0852e83f-39cb-4de4-83bf-902aa6b74b0c
+
+User: Panagiotis Mpoumpouris
+Username: Panagiotis
+Role: Manager
+Temporary Password: !{o3c-O[3XL+
+Legacy User ID: 19
+Identity User ID: 1460bef1-4072-48b4-ac94-73a69a43e123
+

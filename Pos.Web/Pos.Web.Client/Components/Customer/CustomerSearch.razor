@@ -1,0 +1,142 @@
+@inherits FluxorComponent
+@inject IState<CustomerState> CustomerState
+@inject IDispatcher Dispatcher
+
+<div class="customer-search">
+    <!-- Search Field -->
+    <MudAutocomplete T="CustomerDto" 
+                     Label="Search Customer" 
+                     @bind-Value="_selectedCustomer"
+                     SearchFunc="@SearchCustomers"
+                     ToStringFunc="@(c => c?.Name ?? string.Empty)"
+                     Variant="Variant.Outlined"
+                     AdornmentIcon="@Icons.Material.Filled.Search"
+                     AdornmentColor="Color.Primary"
+                     Clearable="true"
+                     ResetValueOnEmptyText="true"
+                     CoerceText="false"
+                     CoerceValue="false"
+                     OnClearButtonClick="@ClearSearch"
+                     DebounceInterval="300"
+                     Class="mb-2">
+        <ItemTemplate Context="customer">
+            <MudGrid Spacing="1" AlignItems="AlignItems.Center">
+                <MudItem xs="1">
+                    <MudAvatar Color="Color.Primary" Size="Size.Small">
+                        @customer.Name.Substring(0, 1).ToUpper()
+                    </MudAvatar>
+                </MudItem>
+                <MudItem xs="8">
+                    <MudText Typo="Typo.body2">@customer.Name</MudText>
+                    <MudText Typo="Typo.caption" Color="Color.Secondary">
+                        @customer.Telephone
+                    </MudText>
+                </MudItem>
+                <MudItem xs="3" Class="text-right">
+                    @if (customer.LoyaltyPoints > 0)
+                    {
+                        <MudChip T="string" Size="Size.Small" Color="Color.Warning" Icon="@Icons.Material.Filled.Star">
+                            @customer.LoyaltyPoints pts
+                        </MudChip>
+                    }
+                </MudItem>
+            </MudGrid>
+        </ItemTemplate>
+    </MudAutocomplete>
+    
+    <!-- Recent Customers -->
+    @if (CustomerState.Value.RecentCustomers.Any() && _selectedCustomer == null)
+    {
+        <MudText Typo="Typo.caption" Class="mb-2">Recent Customers:</MudText>
+        <MudChipSet T="string">
+            @foreach (var customer in CustomerState.Value.RecentCustomers.Take(5))
+            {
+                <MudChip T="string" OnClick="@(() => SelectCustomer(customer))" 
+                        Color="Color.Default" 
+                        Icon="@Icons.Material.Filled.Person">
+                    @customer.Name
+                </MudChip>
+            }
+        </MudChipSet>
+    }
+    
+    <!-- New Customer Button -->
+    <MudButton Variant="Variant.Outlined" 
+             Color="Color.Success" 
+             FullWidth="true"
+             StartIcon="@Icons.Material.Filled.PersonAdd"
+             OnClick="@HandleNewCustomer"
+             Class="mt-2">
+        New Customer
+    </MudButton>
+    
+    <!-- Loading Indicator -->
+    @if (CustomerState.Value.IsSearching)
+    {
+        <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="mt-2" />
+    }
+</div>
+
+@code {
+    private CustomerDto? _selectedCustomer;
+    
+    [Parameter]
+    public EventCallback<CustomerDto> OnCustomerSelected { get; set; }
+    
+    [Parameter]
+    public EventCallback OnNewCustomer { get; set; }
+    
+    private async Task<IEnumerable<CustomerDto>> SearchCustomers(string searchText, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(searchText) || searchText.Length < 2)
+        {
+            return Enumerable.Empty<CustomerDto>();
+        }
+        
+        // Dispatch search action
+        Dispatcher.Dispatch(new CustomerActions.SearchCustomersAction(searchText));
+        
+        // Wait a bit for the search to complete
+        await Task.Delay(100, cancellationToken);
+        
+        // Return search results from state
+        return CustomerState.Value.SearchResults;
+    }
+    
+    private void ClearSearch()
+    {
+        _selectedCustomer = null;
+        Dispatcher.Dispatch(new CustomerActions.ClearSearchResultsAction());
+    }
+    
+    private async Task SelectCustomer(CustomerDto customer)
+    {
+        _selectedCustomer = customer;
+        Dispatcher.Dispatch(new CustomerActions.SelectCustomerAction(customer));
+        
+        if (OnCustomerSelected.HasDelegate)
+        {
+            await OnCustomerSelected.InvokeAsync(customer);
+        }
+    }
+    
+    private async Task HandleNewCustomer()
+    {
+        if (OnNewCustomer.HasDelegate)
+        {
+            await OnNewCustomer.InvokeAsync();
+        }
+    }
+    
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        
+        // When a customer is selected from autocomplete, notify parent
+        if (_selectedCustomer != null && OnCustomerSelected.HasDelegate)
+        {
+            Dispatcher.Dispatch(new CustomerActions.SelectCustomerAction(_selectedCustomer));
+            OnCustomerSelected.InvokeAsync(_selectedCustomer);
+        }
+    }
+}

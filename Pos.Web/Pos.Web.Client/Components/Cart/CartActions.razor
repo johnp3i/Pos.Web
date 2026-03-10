@@ -1,0 +1,140 @@
+<div class="cart-actions">
+    <MudGrid Spacing="2">
+        <!-- Clear Cart Button -->
+        <MudItem xs="12">
+            <MudButton Variant="Variant.Outlined" 
+                     Color="Color.Error" 
+                     FullWidth="true"
+                     StartIcon="@Icons.Material.Filled.DeleteSweep"
+                     OnClick="@HandleClearCart"
+                     Class="pos-action-button">
+                Clear Cart
+            </MudButton>
+        </MudItem>
+        
+        <!-- Save Pending Button -->
+        <MudItem xs="12">
+            <MudButton Variant="Variant.Outlined" 
+                     Color="Color.Info" 
+                     FullWidth="true"
+                     StartIcon="@Icons.Material.Filled.Save"
+                     OnClick="@HandleSavePending"
+                     Disabled="@_isSaving"
+                     Class="pos-action-button">
+                @if (_isSaving)
+                {
+                    <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mr-2" />
+                    <text>Saving...</text>
+                }
+                else
+                {
+                    <text>Save Pending</text>
+                }
+            </MudButton>
+        </MudItem>
+        
+        <!-- Apply Discount Button -->
+        <MudItem xs="12">
+            <MudButton Variant="Variant.Outlined" 
+                     Color="Color.Success" 
+                     FullWidth="true"
+                     StartIcon="@Icons.Material.Filled.Discount"
+                     OnClick="@HandleApplyDiscount"
+                     Class="pos-action-button">
+                Apply Discount
+            </MudButton>
+        </MudItem>
+        
+        <!-- Checkout Button -->
+        <MudItem xs="12">
+            <MudButton Variant="Variant.Filled" 
+                     Color="Color.Primary" 
+                     FullWidth="true"
+                     Size="Size.Large"
+                     StartIcon="@Icons.Material.Filled.Payment"
+                     OnClick="@HandleCheckout"
+                     Disabled="@(!CanCheckout())"
+                     Class="pos-action-button checkout-button">
+                Checkout (@Order.TotalAmount.ToString("C"))
+            </MudButton>
+        </MudItem>
+    </MudGrid>
+</div>
+
+<style>
+    .cart-actions {
+        padding: 8px 0;
+    }
+    
+    .pos-action-button {
+        min-height: 48px;
+        font-size: 1rem;
+        font-weight: 600;
+    }
+    
+    .checkout-button {
+        min-height: 56px;
+        font-size: 1.1rem;
+    }
+</style>
+
+@code {
+    [Parameter, EditorRequired]
+    public OrderDto Order { get; set; } = null!;
+    
+    [Parameter]
+    public EventCallback OnClearCart { get; set; }
+    
+    [Parameter]
+    public EventCallback OnSavePending { get; set; }
+    
+    [Parameter]
+    public EventCallback OnCheckout { get; set; }
+    
+    private bool _isSaving = false;
+    
+    private async Task HandleClearCart()
+    {
+        // TODO: Add confirmation dialog
+        if (OnClearCart.HasDelegate)
+        {
+            await OnClearCart.InvokeAsync();
+        }
+    }
+    
+    private async Task HandleSavePending()
+    {
+        _isSaving = true;
+        
+        try
+        {
+            if (OnSavePending.HasDelegate)
+            {
+                await OnSavePending.InvokeAsync();
+            }
+        }
+        finally
+        {
+            _isSaving = false;
+        }
+    }
+    
+    private async Task HandleApplyDiscount()
+    {
+        // TODO: Open discount dialog
+        Console.WriteLine("Apply discount clicked");
+    }
+    
+    private async Task HandleCheckout()
+    {
+        if (OnCheckout.HasDelegate && CanCheckout())
+        {
+            await OnCheckout.InvokeAsync();
+        }
+    }
+    
+    private bool CanCheckout()
+    {
+        return Order.Items.Any() && Order.TotalAmount > 0;
+    }
+}

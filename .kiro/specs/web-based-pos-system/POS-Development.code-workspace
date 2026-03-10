@@ -1,0 +1,37 @@
+{
+  "folders": [
+    {
+      "name": "🌐 Pos.Web (New Web POS)",
+      "path": "../../../Pos.Web"
+    },
+    {
+      "name": "🖥️ MyChairPos (Legacy WPF POS)",
+      "path": "../../../MyChairPos"
+    }
+  ],
+  "settings": {
+    "files.exclude": {
+      "**/bin": true,
+      "**/obj": true,
+      "**/.vs": true,
+      "**/node_modules": true
+    },
+    "search.exclude": {
+      "**/bin": true,
+      "**/obj": true,
+      "**/node_modules": true
+    },
+    "files.watcherExclude": {
+      "**/bin/**": true,
+      "**/obj/**": true,
+      "**/node_modules/**": true
+    }
+  },
+  "extensions": {
+    "recommendations": [
+      "ms-dotnettools.csharp",
+      "ms-dotnettools.csdevkit",
+      "ms-vscode.vscode-typescript-next"
+    ]
+  }
+}

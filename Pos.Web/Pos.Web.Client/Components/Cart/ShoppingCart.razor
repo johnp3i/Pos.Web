@@ -1,0 +1,120 @@
+@inherits FluxorComponent
+@inject IState<OrderState> OrderState
+@inject IDispatcher Dispatcher
+
+<MudPaper Elevation="2" Class="shopping-cart pa-3">
+    <!-- Cart Header -->
+    <div class="cart-header mb-3">
+        <MudText Typo="Typo.h6" Color="Color.Primary">
+            <MudIcon Icon="@Icons.Material.Filled.ShoppingCart" Class="mr-2" />
+            Shopping Cart
+        </MudText>
+        
+        @if (OrderState.Value.CurrentOrder?.Items.Any() == true)
+        {
+            <MudChip T="string" Size="Size.Small" Color="Color.Secondary">
+                @OrderState.Value.CurrentOrder.Items.Sum(i => i.Quantity) items
+            </MudChip>
+        }
+    </div>
+    
+    <!-- Cart Items -->
+    <div class="cart-items">
+        @if (OrderState.Value.CurrentOrder?.Items.Any() == true)
+        {
+            @foreach (var item in OrderState.Value.CurrentOrder.Items)
+            {
+                <CartItem Item="@item" 
+                         OnQuantityChanged="@HandleQuantityChanged"
+                         OnRemove="@HandleRemoveItem"
+                         OnNotesChanged="@HandleNotesChanged" />
+            }
+        }
+        else
+        {
+            <MudAlert Severity="Severity.Info" Class="mt-2">
+                <MudText Typo="Typo.body2">
+                    Cart is empty. Add items to get started.
+                </MudText>
+            </MudAlert>
+        }
+    </div>
+    
+    <!-- Cart Summary -->
+    @if (OrderState.Value.CurrentOrder?.Items.Any() == true)
+    {
+        <MudDivider Class="my-3" />
+        <CartSummary Order="@OrderState.Value.CurrentOrder" />
+    }
+    
+    <!-- Cart Actions -->
+    @if (OrderState.Value.CurrentOrder?.Items.Any() == true)
+    {
+        <MudDivider Class="my-3" />
+        <CartActions Order="@OrderState.Value.CurrentOrder" 
+                    OnClearCart="@HandleClearCart"
+                    OnSavePending="@HandleSavePending"
+                    OnCheckout="@HandleCheckout" />
+    }
+</MudPaper>
+
+<style>
+    .shopping-cart {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .cart-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .cart-items {
+        flex: 1;
+        overflow-y: auto;
+        max-height: 50vh;
+    }
+</style>
+
+@code {
+    [Parameter]
+    public EventCallback OnCheckout { get; set; }
+    
+    private void HandleQuantityChanged((OrderItemDto item, int newQuantity) args)
+    {
+        Dispatcher.Dispatch(new OrderActions.UpdateItemQuantityAction(args.item.Id, args.newQuantity));
+    }
+    
+    private void HandleRemoveItem(OrderItemDto item)
+    {
+        Dispatcher.Dispatch(new OrderActions.RemoveItemFromOrderAction(item.Id));
+    }
+    
+    private void HandleNotesChanged((OrderItemDto item, string notes) args)
+    {
+        Dispatcher.Dispatch(new OrderActions.UpdateItemNotesAction(args.item.Id, args.notes));
+    }
+    
+    private void HandleClearCart()
+    {
+        Dispatcher.Dispatch(new OrderActions.ClearCurrentOrderAction());
+    }
+    
+    private void HandleSavePending()
+    {
+        if (OrderState.Value.CurrentOrder != null)
+        {
+            Dispatcher.Dispatch(new OrderActions.SaveAsPendingAction());
+        }
+    }
+    
+    private async Task HandleCheckout()
+    {
+        if (OnCheckout.HasDelegate)
+        {
+            await OnCheckout.InvokeAsync();
+        }
+    }
+}

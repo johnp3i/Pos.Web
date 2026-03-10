@@ -1,0 +1,128 @@
+@inherits FluxorComponent
+@inject IState<CustomerState> CustomerState
+@inject IDispatcher Dispatcher
+
+<MudCard Elevation="2">
+    <MudCardHeader>
+        <CardHeaderContent>
+            <MudText Typo="Typo.h6">Order History</MudText>
+            @if (Customer != null)
+            {
+                <MudText Typo="Typo.body2" Color="Color.Secondary">
+                    @Customer.Name - @Customer.TotalOrders total orders
+                </MudText>
+            }
+        </CardHeaderContent>
+        <CardHeaderActions>
+            <MudIconButton Icon="@Icons.Material.Filled.Refresh" 
+                         Color="Color.Primary" 
+                         OnClick="@LoadHistory"
+                         Disabled="@CustomerState.Value.IsLoadingHistory"
+                         Title="Refresh" />
+        </CardHeaderActions>
+    </MudCardHeader>
+    
+    <MudCardContent>
+        @if (CustomerState.Value.IsLoadingHistory)
+        {
+            <div class="text-center pa-4">
+                <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+                <MudText Typo="Typo.body2" Class="mt-2">Loading order history...</MudText>
+            </div>
+        }
+        else if (CustomerState.Value.CustomerHistory.Any())
+        {
+            <MudTable Items="@CustomerState.Value.CustomerHistory" 
+                     Hover="true" 
+                     Dense="true"
+                     Class="customer-history-table">
+                <HeaderContent>
+                    <MudTh>Order #</MudTh>
+                    <MudTh>Date</MudTh>
+                    <MudTh>Service Type</MudTh>
+                    <MudTh>Items</MudTh>
+                    <MudTh>Total</MudTh>
+                    <MudTh>Status</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Order #">@context.Id</MudTd>
+                    <MudTd DataLabel="Date">@context.CreatedAt.ToString("MMM dd, yyyy HH:mm")</MudTd>
+                    <MudTd DataLabel="Service Type">
+                        <MudChip T="string" Size="Size.Small" Color="@GetServiceTypeColor(context.ServiceType)">
+                            @context.ServiceType
+                        </MudChip>
+                    </MudTd>
+                    <MudTd DataLabel="Items">@context.Items.Count</MudTd>
+                    <MudTd DataLabel="Total">@context.TotalAmount.ToString("C")</MudTd>
+                    <MudTd DataLabel="Status">
+                        <MudChip T="string" Size="Size.Small" Color="@GetStatusColor(context.Status)">
+                            @context.Status
+                        </MudChip>
+                    </MudTd>
+                </RowTemplate>
+            </MudTable>
+        }
+        else
+        {
+            <MudAlert Severity="Severity.Info">
+                No order history found for this customer.
+            </MudAlert>
+        }
+    </MudCardContent>
+</MudCard>
+
+<style>
+    .customer-history-table {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+</style>
+
+@code {
+    [Parameter]
+    public CustomerDto? Customer { get; set; }
+    
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        
+        // Load history when customer changes
+        if (Customer != null && Customer.Id > 0)
+        {
+            LoadHistory();
+        }
+    }
+    
+    private void LoadHistory()
+    {
+        if (Customer != null && Customer.Id > 0)
+        {
+            Dispatcher.Dispatch(new CustomerActions.LoadCustomerHistoryAction(Customer.Id));
+        }
+    }
+    
+    private Color GetServiceTypeColor(ServiceType serviceType)
+    {
+        return serviceType switch
+        {
+            ServiceType.DineIn => Color.Primary,
+            ServiceType.Takeout => Color.Info,
+            ServiceType.Delivery => Color.Success,
+            _ => Color.Default
+        };
+    }
+    
+    private Color GetStatusColor(OrderStatus status)
+    {
+        return status switch
+        {
+            OrderStatus.Pending => Color.Warning,
+            OrderStatus.Preparing => Color.Info,
+            OrderStatus.Ready => Color.Success,
+            OrderStatus.Delivered => Color.Success,
+            OrderStatus.Completed => Color.Success,
+            OrderStatus.Cancelled => Color.Error,
+            _ => Color.Default
+        };
+    }
+}

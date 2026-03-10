@@ -1,0 +1,22 @@
+@inherits LayoutComponentBase
+
+<MudThemeProvider Theme="@_identityTheme" />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<div class="identity-layout">
+    <MudContainer MaxWidth="MaxWidth.Small">
+        @Body
+    </MudContainer>
+</div>
+
+@code {
+    private MudTheme _identityTheme = new MudTheme()
+    {
+        PaletteLight = new PaletteLight()
+        {
+            Primary = "#1976D2",
+            Background = "#f5f5f5"
+        }
+    };
+}

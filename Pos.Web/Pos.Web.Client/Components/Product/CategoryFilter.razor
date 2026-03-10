@@ -1,0 +1,116 @@
+@inherits FluxorComponent
+
+@using Pos.Web.Client.Store.ProductCatalog
+@using Pos.Web.Shared.DTOs
+
+@inject IState<ProductCatalogState> ProductCatalogState
+@inject IDispatcher Dispatcher
+
+<div class="category-filter @Class">
+    <MudChipSet T="int?" @bind-SelectedChip="_selectedChip" 
+                Filter="true" 
+                Mandatory="false"
+                OnClose="@HandleChipClose">
+        <!-- All Categories Chip -->
+        <MudChip T="int?" Text="All" 
+                 Value="@((int?)null)" 
+                 Color="Color.Primary" 
+                 Icon="@Icons.Material.Filled.Apps"
+                 OnClick="@(() => FilterByCategory(null))">
+            All Categories
+        </MudChip>
+        
+        <!-- Category Chips -->
+        @foreach (var category in ProductCatalogState.Value.Categories.OrderBy(c => c.DisplayOrder))
+        {
+            <MudChip T="int?" Text="@category.Name" 
+                     Value="@category.Id" 
+                     Color="Color.Primary" 
+                     Icon="@GetCategoryIcon(category)"
+                     OnClick="@(() => FilterByCategory(category.Id))"
+                     Class="pos-category-chip">
+                @category.Name
+                @if (GetProductCountForCategory(category.Id) > 0)
+                {
+                    <MudBadge Content="@GetProductCountForCategory(category.Id)" 
+                             Color="Color.Secondary" 
+                             Overlap="true" 
+                             Class="ml-2" />
+                }
+            </MudChip>
+        }
+    </MudChipSet>
+    
+    <!-- Loading Indicator -->
+    @if (ProductCatalogState.Value.IsLoadingCategories)
+    {
+        <MudProgressCircular Color="Color.Primary" Size="Size.Small" Indeterminate="true" Class="ml-2" />
+    }
+</div>
+
+<style>
+    .category-filter {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    
+    .pos-category-chip {
+        font-size: 0.95rem;
+        font-weight: 500;
+    }
+</style>
+
+@code {
+    /// <summary>
+    /// Additional CSS classes to apply to the component
+    /// </summary>
+    [Parameter]
+    public string? Class { get; set; }
+    
+    private MudChip<int?>? _selectedChip;
+    
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        
+        // Load categories if not already loaded
+        if (!ProductCatalogState.Value.Categories.Any() && !ProductCatalogState.Value.IsLoadingCategories)
+        {
+            Dispatcher.Dispatch(new ProductCatalogActions.LoadCategoriesAction());
+        }
+    }
+    
+    private void FilterByCategory(int? categoryId)
+    {
+        Dispatcher.Dispatch(new ProductCatalogActions.FilterByCategoryAction(categoryId));
+    }
+    
+    private void HandleChipClose(MudChip<int?> chip)
+    {
+        // When chip is closed, show all categories
+        FilterByCategory(null);
+    }
+    
+    private int GetProductCountForCategory(int categoryId)
+    {
+        return ProductCatalogState.Value.Products
+            .Count(p => p.CategoryId == categoryId && p.IsAvailable && p.IsInStock);
+    }
+    
+    private string GetCategoryIcon(CategoryDto category)
+    {
+        // Map category names to icons (can be customized based on category type)
+        return category.Name.ToLower() switch
+        {
+            var n when n.Contains("coffee") => Icons.Material.Filled.Coffee,
+            var n when n.Contains("food") || n.Contains("meal") => Icons.Material.Filled.Restaurant,
+            var n when n.Contains("drink") || n.Contains("beverage") => Icons.Material.Filled.LocalDrink,
+            var n when n.Contains("dessert") || n.Contains("cake") => Icons.Material.Filled.Cake,
+            var n when n.Contains("snack") => Icons.Material.Filled.Fastfood,
+            var n when n.Contains("breakfast") => Icons.Material.Filled.FreeBreakfast,
+            _ => Icons.Material.Filled.Category
+        };
+    }
+}
